@@ -1,0 +1,61 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace LINQtoObject
+{
+    static class ExtensionLINQ
+    {
+        static public T ObjectMin<T>(this IEnumerable<T> resourse, Func<T, object> selector)
+        {
+            T min = resourse.First();
+            foreach (T obj in resourse)
+                if (Compare(selector(obj), selector(min)))
+                {
+                    min = obj;
+                }
+            return min;
+        }
+
+        static public T ObjectMax<T>(this IEnumerable<T> resourse, Func<T, T, bool> comparator)
+        {
+            T max = resourse.First();
+            foreach(T obj in resourse)
+                if (comparator(obj, max))
+                    max = obj;
+            return max;
+        }
+
+        static public IEnumerable<T> NewAppend<T>(this IEnumerable<T> resourse, T element)
+        {
+            foreach (T el in resourse)
+                yield return el;
+            yield return element;
+        }
+
+        static public IEnumerable<T> NewPrepend<T>(this IEnumerable<T> resourse, T element)
+        {
+            yield return element;
+            foreach (T el in resourse)
+                yield return el;
+        }
+
+        private static bool Compare(object t1, object t2)
+        {
+            Type tp = t1.GetType();
+            if(tp.IsValueType)
+            {
+                int tempLeft = Convert.ToInt32(t1);
+                int tempRight = Convert.ToInt32(t2);
+                return tempLeft < tempRight;
+            }
+            if (typeof(string).Equals(tp))
+            {
+                string tempLeft = t1.ToString();
+                string tempRight = t2.ToString();
+                return tempLeft.CompareTo(tempRight) < 0;
+            }
+            return false;
+        }
+    }
+}
